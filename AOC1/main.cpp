@@ -2,11 +2,21 @@
 #include <fstream>
 #include <string>
 #include <cstdint>
+#include <vector>
+#include <algorithm>
 
-std::pair<int32_t, int32_t> find_elf(std::ifstream& stream)
+int main()
 {
-	std::pair<int32_t, int32_t> elf;
-	int32_t index = 0, total = 0;
+	std::ifstream stream("input.txt");
+
+	if(!stream)
+	{
+		std::cerr << "File could not be loaded" << "\n";
+		return -1;
+	}
+
+	std::vector<int32_t> totals;
+	int32_t total = 0;
 
 	while(stream)
 	{
@@ -20,34 +30,17 @@ std::pair<int32_t, int32_t> find_elf(std::ifstream& stream)
 		}
 		else
 		{
-			if(total > elf.second)
-			{
-				elf.first = index;
-				elf.second = total;
-			}
-
-			++index;
+			totals.push_back(total);
 			total = 0;
 		}
 	}
 
-	return elf;
-}
+	std::sort(totals.begin(), totals.end());
 
-int main()
-{
-	std::ifstream stream("input.txt");
+	int32_t size = totals.size();
+	int32_t calories = totals[size - 1] + totals[size - 2] + totals[size - 3];
 
-	if(!stream)
-	{
-		std::cerr << "File could not be loaded" << "\n";
-		return -1;
-	}
-
-	std::pair<int32_t, int32_t> elf = find_elf(stream);
-
-	std::cout << "The Elf with the most calories is Elf " << elf.first << "\n";
-	std::cout << "Elf " << elf.first << " has " << elf.second << " calories\n";
+	std::cout << "The combined calories of the three Elves with the most calories is " << calories << "\n";
 
 	return 0;
 }
